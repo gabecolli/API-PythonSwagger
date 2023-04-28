@@ -1,0 +1,97 @@
+# swagger.yml
+
+
+#openapi keyword used to define the mandatory version
+openapi: 3.0.0
+info:
+  title: "RP Flask REST API"
+  description: "An API about people and notes"
+  version: "1.0.0"
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Person:
+      type: 'object' #data type of the schema
+      required: #required properties
+       - lname
+      properties:
+      #all properties of the Person object are strings
+        fname:
+          type: 'string'
+        lname:
+          type: 'string'
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the person to get"
+      in: path #this means the value for the parameter (in this case lname) will be passed in the URL (e.g. /people/Smith
+      required: True
+      schema:
+        type: "string"
+
+paths:
+  /people:
+    get: # get: The HTTP method that this URL endpoint will respond to
+      operationId: "people.read_all" #operationId: The Python function that’ll respond to the request
+      #in a module named people calls the read_all function
+      tags:
+        - "People"
+      summary: "Read the list of people"
+      responses:
+        "200"
+          description: "Successfully read people list"
+    post:
+      operationId: "people.create" #the method that’ll respond to the request
+      tags:
+        - People
+      summary: "Create a person"
+      requestBody:
+          description: "Person to create"
+          required: True
+          content:
+            application/json: #defines the data exchange format
+              schema:
+                x-body-name: "person"
+                $ref: "#/components/schemas/Person" #referencing the schema under components
+      responses:
+        "201":
+          description: "Successfully created person"    
+  /people/{lname}:  #similiar to the path /people this also has a get. except it has a parameter lname to be passed into the URL
+    get:
+      operationId: "people.read_one"
+      tags:
+        - People
+      summary: "Read one person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read person"
+    put:
+      tags:
+        - People
+      operationId: "people.update"
+      summary: "Update a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully updated person"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "person"
+              $ref: "#/components/schemas/Person"
+    delete:
+      tags:
+        - People
+      operationId: "people.delete"
+      summary: "Delete a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "204":
+          description: "Successfully deleted person"
